@@ -95,15 +95,15 @@
       align-items: center;
     }
 
-    /* Кликабельная иконка blisschat по референсу */
-    .icon-btn {
-      width: 96px;
-      height: 96px;
+    /* Твоё фото по центру вместо иконки + переключение на второе по нажатию */
+    .photo-btn {
+      width: 104px;
+      height: 104px;
       margin-bottom: 20px;
-      border: none;
-      border-radius: 26px;
+      border: 1.5px solid rgba(128, 213, 201, 0.28);
+      border-radius: 28px;
       padding: 0;
-      background: #a8e2d4;
+      background: var(--surface);
       overflow: hidden;
       cursor: pointer;
       box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
@@ -111,12 +111,11 @@
       -webkit-touch-callout: none;
     }
 
-    .icon-btn:active {
+    .photo-btn:active {
       transform: scale(0.96);
     }
 
-    .icon-btn svg,
-    .icon-btn img {
+    .photo-btn img {
       width: 100%;
       height: 100%;
       display: block;
@@ -224,22 +223,8 @@
   </div>
 
   <main class="card">
-    <button id="iconToggle" class="icon-btn" type="button" aria-label="Иконка BlissChat">
-      <svg id="blissIconSvg" viewBox="0 0 120 120">
-        <defs>
-          <linearGradient id="blissGrad" x1="60" y1="22" x2="60" y2="108" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#0d6c6c" />
-            <stop offset="48%" stop-color="#5c2824" />
-            <stop offset="100%" stop-color="#b5110d" />
-          </linearGradient>
-        </defs>
-        <rect width="120" height="120" fill="#a8e2d4" />
-        <path d="M-8,-8 L64,-8 C54,14 34,26 12,26 C2,26 -4,22 -8,18 Z" fill="#cbece4" />
-        <path d="M128,48 L128,128 L56,128 C64,104 82,86 102,74 C112,68 120,58 128,48 Z" fill="#5b6f6f" />
-        <line x1="62" y1="34" x2="77" y2="17" stroke="#0d6c6c" stroke-width="9.5" stroke-linecap="round" />
-        <path id="blissFlowerPath" fill="url(#blissGrad)" fill-rule="evenodd" />
-      </svg>
-      <img id="numbersImg" src="1795540246710.jpg" alt="" draggable="false" hidden />
+    <button id="photoToggle" class="photo-btn" type="button" aria-label="Сменить фото">
+      <img id="photoImg" src="Screenshot_20261118_101200_Vexel.jpg" alt="" draggable="false" />
     </button>
 
     <h1>Добро пожаловать</h1>
@@ -260,6 +245,12 @@
   </main>
 
   <script>
+    const FIRST_PHOTO = "Screenshot_20261118_101200_Vexel.jpg";
+    const SECOND_PHOTO = "1795540246710.jpg";
+
+    const preloadSecond = new Image();
+    preloadSecond.src = SECOND_PHOTO;
+
     function buildSmoothWave(cx, cy, baseR, amp, waves, samples = 240) {
       let d = "";
       for (let i = 0; i <= samples; i++) {
@@ -272,22 +263,16 @@
       return d + "Z";
     }
 
-    document.getElementById("blissFlowerPath").setAttribute(
-      "d",
-      buildSmoothWave(60, 65, 42.5, 3.2, 16, 280) + " " + buildSmoothWave(60, 65, 23.5, 2.1, 16, 240)
-    );
     document.getElementById("bgWave1").setAttribute("d", buildSmoothWave(120, 120, 92, 9, 12, 240));
     document.getElementById("bgWave2").setAttribute("d", buildSmoothWave(120, 120, 96, 10, 10, 240));
 
-    const iconToggle = document.getElementById("iconToggle");
-    const blissIconSvg = document.getElementById("blissIconSvg");
-    const numbersImg = document.getElementById("numbersImg");
-    let showNumbers = false;
+    const photoToggle = document.getElementById("photoToggle");
+    const photoImg = document.getElementById("photoImg");
+    let isSecond = false;
 
-    iconToggle.addEventListener("click", () => {
-      showNumbers = !showNumbers;
-      blissIconSvg.hidden = showNumbers;
-      numbersImg.hidden = !showNumbers;
+    photoToggle.addEventListener("click", () => {
+      isSecond = !isSecond;
+      photoImg.src = isSecond ? SECOND_PHOTO : FIRST_PHOTO;
     });
   </script>
 
