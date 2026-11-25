@@ -52,7 +52,7 @@
       overflow-x: hidden;
     }
 
-    /* Ровные зубчатые M3-фигуры на фоне */
+    /* Плавные волнистые фигуры Material You на фоне */
     .m3-bg {
       position: fixed;
       inset: 0;
@@ -61,32 +61,32 @@
       overflow: hidden;
     }
 
-    .gear-top-right {
+    .m3-wave-top {
       position: absolute;
-      width: clamp(220px, 52vw, 340px);
-      height: clamp(220px, 52vw, 340px);
-      top: -70px;
-      right: -70px;
-      opacity: 0.24;
-      animation: spinSlow 36s linear infinite;
+      width: clamp(240px, 56vw, 360px);
+      height: clamp(240px, 56vw, 360px);
+      top: -75px;
+      right: -75px;
+      opacity: 0.22;
+      animation: waveFloat 28s linear infinite;
     }
 
-    .gear-bottom-left {
+    .m3-wave-bottom {
       position: absolute;
-      width: clamp(240px, 58vw, 380px);
-      height: clamp(240px, 58vw, 380px);
-      bottom: -85px;
-      left: -85px;
-      opacity: 0.2;
-      animation: spinSlow 44s linear infinite reverse;
+      width: clamp(260px, 62vw, 400px);
+      height: clamp(260px, 62vw, 400px);
+      bottom: -95px;
+      left: -95px;
+      opacity: 0.18;
+      animation: waveFloat 34s linear infinite reverse;
     }
 
-    @keyframes spinSlow {
+    @keyframes waveFloat {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
 
-    /* Основная ровная карточка */
+    /* Основная карточка */
     .card {
       position: relative;
       z-index: 1;
@@ -105,22 +105,21 @@
       align-items: center;
     }
 
-    /* Иконка blisschat в стиле 2-го фото */
+    /* Иконка blisschat в точности как на картинке */
     .app-icon-box {
-      width: 92px;
-      height: 92px;
+      width: 96px;
+      height: 96px;
       border-radius: 26px;
-      background: #969e9d;
-      display: grid;
-      place-items: center;
+      overflow: hidden;
       margin-bottom: 16px;
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
-      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.38);
+      border: 1px solid rgba(168, 226, 212, 0.25);
+      background: #a8e2d4;
     }
 
     .app-icon-svg {
-      width: 74px;
-      height: 74px;
+      width: 100%;
+      height: 100%;
       display: block;
     }
 
@@ -294,11 +293,11 @@
 </head>
 <body>
   <div class="m3-bg" aria-hidden="true">
-    <svg class="gear-top-right" viewBox="0 0 200 200">
-      <path id="bgGear1" fill="#1d6b65"></path>
+    <svg class="m3-wave-top" viewBox="0 0 240 240">
+      <path id="bgSmoothFlower1" fill="#1e7b74"></path>
     </svg>
-    <svg class="gear-bottom-left" viewBox="0 0 200 200">
-      <path id="bgGear2" fill="#154e49"></path>
+    <svg class="m3-wave-bottom" viewBox="0 0 240 240">
+      <path id="bgSmoothFlower2" fill="#165752"></path>
     </svg>
   </div>
 
@@ -306,14 +305,32 @@
     <div class="app-icon-box" aria-hidden="true">
       <svg class="app-icon-svg" viewBox="0 0 120 120">
         <defs>
-          <linearGradient id="blissGrad" x1="60" y1="12" x2="60" y2="108" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stop-color="#1e827c" />
-            <stop offset="52%" stop-color="#6b3228" />
-            <stop offset="100%" stop-color="#b81d18" />
+          <linearGradient id="blissRingGrad" x1="60" y1="22" x2="60" y2="108" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#0d6c6c" />
+            <stop offset="48%" stop-color="#5c2824" />
+            <stop offset="100%" stop-color="#b5110d" />
           </linearGradient>
+          <clipPath id="iconClip">
+            <rect width="120" height="120" rx="28" />
+          </clipPath>
         </defs>
-        <path id="blissScallop" fill="url(#blissGrad)"></path>
-        <circle cx="60" cy="60" r="21" fill="#969e9d" />
+
+        <g clip-path="url(#iconClip)">
+          <!-- Базовый мятный фон -->
+          <rect width="120" height="120" fill="#a8e2d4" />
+
+          <!-- Верхнее светлое пятно слева -->
+          <path d="M-8,-8 L64,-8 C54,14 34,26 12,26 C2,26 -4,22 -8,18 Z" fill="#cbece4" />
+
+          <!-- Нижнее тёмно-серое пятно справа -->
+          <path d="M128,48 L128,128 L56,128 C64,104 82,86 102,74 C112,68 120,58 128,48 Z" fill="#5b6f6f" />
+
+          <!-- Скруглённый штрих/хвостик сверху-справа -->
+          <line x1="62" y1="34" x2="77" y2="17" stroke="#0d6c6c" stroke-width="9.5" stroke-linecap="round" />
+
+          <!-- Плавный волнистый цветок с вырезом по центру -->
+          <path id="blissFlowerPath" fill="url(#blissRingGrad)" fill-rule="evenodd" />
+        </g>
       </svg>
     </div>
 
@@ -343,30 +360,41 @@
   </main>
 
   <script>
-    // Построение ровных зубчатых / цветочных контуров в стиле Material You
-    function buildScallopPath(cx, cy, outerR, innerR, lobes) {
-      const steps = lobes * 2;
+    // Плавный волнистый контур (через синусоиду — без острых зубцов)
+    function buildSmoothWaveCircle(cx, cy, baseR, amp, waves, samples = 240) {
       let d = "";
-      for (let i = 0; i <= steps; i++) {
-        const a1 = (i / steps) * Math.PI * 2;
-        const a2 = ((i + 0.5) / steps) * Math.PI * 2;
-        const r1 = i % 2 === 0 ? outerR : innerR;
-        const r2 = i % 2 === 0 ? innerR : outerR;
-        const x1 = cx + Math.cos(a1) * r1;
-        const y1 = cy + Math.sin(a1) * r1;
-        if (i === 0) d += `M ${x1.toFixed(2)} ${y1.toFixed(2)} `;
-        const ctrlX = cx + Math.cos((a1 + a2) * 0.5) * ((r1 + r2) * 0.53);
-        const ctrlY = cy + Math.sin((a1 + a2) * 0.5) * ((r1 + r2) * 0.53);
-        const endX = cx + Math.cos(a2) * r2;
-        const endY = cy + Math.sin(a2) * r2;
-        d += `Q ${ctrlX.toFixed(2)} ${ctrlY.toFixed(2)} ${endX.toFixed(2)} ${endY.toFixed(2)} `;
+      for (let i = 0; i <= samples; i++) {
+        const t = (i / samples) * Math.PI * 2;
+        const r = baseR + amp * Math.cos(t * waves);
+        const x = cx + Math.cos(t) * r;
+        const y = cy + Math.sin(t) * r;
+        d += (i === 0 ? "M " : "L ") + `${x.toFixed(2)} ${y.toFixed(2)} `;
       }
       return d + "Z";
     }
 
-    document.getElementById("blissScallop").setAttribute("d", buildScallopPath(60, 60, 48, 39, 14));
-    document.getElementById("bgGear1").setAttribute("d", buildScallopPath(100, 100, 86, 68, 12));
-    document.getElementById("bgGear2").setAttribute("d", buildScallopPath(100, 100, 88, 70, 10));
+    function buildSmoothFlowerRing(cx, cy, outerBase, outerAmp, innerBase, innerAmp, waves) {
+      return (
+        buildSmoothWaveCircle(cx, cy, outerBase, outerAmp, waves, 280) +
+        " " +
+        buildSmoothWaveCircle(cx, cy, innerBase, innerAmp, waves, 240)
+      );
+    }
+
+    document.getElementById("blissFlowerPath").setAttribute(
+      "d",
+      buildSmoothFlowerRing(60, 65, 42.5, 3.2, 23.5, 2.1, 16)
+    );
+
+    document.getElementById("bgSmoothFlower1").setAttribute(
+      "d",
+      buildSmoothWaveCircle(120, 120, 92, 9, 12, 240)
+    );
+
+    document.getElementById("bgSmoothFlower2").setAttribute(
+      "d",
+      buildSmoothWaveCircle(120, 120, 96, 10, 10, 240)
+    );
   </script>
 
   <script type="module">
