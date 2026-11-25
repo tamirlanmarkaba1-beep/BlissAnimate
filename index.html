@@ -3,23 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>BlissAnimate</title>
+  <title>BlissChat — Вход через Google</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     :root {
       color-scheme: dark;
-      --bg: #0c1615;
-      --surface: #132221;
-      --surface-high: #1b2f2d;
-      --primary: #74dfd4;
-      --on-primary: #003733;
-      --secondary-container: #1b3432;
-      --on-secondary-container: #ccebe7;
-      --fg: #e4f3f1;
-      --muted: #98b7b3;
-      --outline: rgba(116, 223, 212, 0.22);
+      --bg-dark: #0e1c1b;
+      --surface: #1b2827;
+      --surface-variant: #253635;
+      --primary: #80d5c9;
+      --on-primary: #003732;
+      --text-main: #e3eceb;
+      --text-muted: #9eb3b0;
+      --outline: #52736f;
+      --error: #ffb4ab;
       --font: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     }
 
@@ -27,6 +26,7 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      font-family: var(--font);
       -webkit-tap-highlight-color: transparent;
       -webkit-user-select: none;
       user-select: none;
@@ -34,159 +34,311 @@
 
     body {
       min-height: 100dvh;
-      background: var(--bg);
-      color: var(--fg);
-      font-family: var(--font);
+      background-color: var(--bg-dark);
+      color: var(--text-main);
       display: flex;
       align-items: center;
       justify-content: center;
       padding: max(20px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Плавные фигуры Material You на фоне */
+    .m3-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .m3-wave-top {
+      position: absolute;
+      width: clamp(240px, 56vw, 360px);
+      height: clamp(240px, 56vw, 360px);
+      top: -75px;
+      right: -75px;
+      opacity: 0.22;
+      animation: waveSpin 30s linear infinite;
+    }
+
+    .m3-wave-bottom {
+      position: absolute;
+      width: clamp(260px, 62vw, 400px);
+      height: clamp(260px, 62vw, 400px);
+      bottom: -95px;
+      left: -95px;
+      opacity: 0.18;
+      animation: waveSpin 38s linear infinite reverse;
+    }
+
+    @keyframes waveSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
     .card {
+      position: relative;
+      z-index: 1;
       width: 100%;
-      max-width: 420px;
-      background: var(--surface);
-      border: 1px solid var(--outline);
+      max-width: 400px;
+      background: rgba(20, 36, 35, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(128, 213, 201, 0.16);
       border-radius: 32px;
-      padding: 20px;
+      padding: 32px 24px;
+      text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 14px;
-      box-shadow: 0 20px 44px rgba(0, 0, 0, 0.45);
-      opacity: 0;
-      filter: blur(10px);
-      transform: translateY(16px);
-      transition: opacity 0.6s ease, filter 0.9s ease, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .card.ready {
-      opacity: 1;
-      filter: blur(0);
-      transform: translateY(0);
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 6px 14px;
-      border-radius: 999px;
-      background: var(--secondary-container);
-      color: var(--on-secondary-container);
-      font-size: 12.5px;
-      font-weight: 800;
-    }
-
-    .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--primary);
-    }
-
-    .photo-btn {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 9 / 16;
-      max-height: 68dvh;
-      border: 1.5px solid var(--outline);
-      border-radius: 24px;
+    /* Кликабельная иконка blisschat по референсу */
+    .icon-btn {
+      width: 96px;
+      height: 96px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 26px;
+      padding: 0;
+      background: #a8e2d4;
       overflow: hidden;
-      background: var(--surface-high);
       cursor: pointer;
-      display: block;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+      transition: transform 0.16s ease;
       -webkit-touch-callout: none;
-      touch-action: manipulation;
     }
 
-    .photo-btn img {
+    .icon-btn:active {
+      transform: scale(0.96);
+    }
+
+    .icon-btn svg,
+    .icon-btn img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
       display: block;
+      object-fit: cover;
       -webkit-touch-callout: none;
       -webkit-user-drag: none;
-      transition: opacity 0.25s ease, filter 0.35s ease;
     }
 
-    .photo-btn.switching img {
-      opacity: 0.35;
-      filter: blur(6px);
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 6px;
     }
 
-    .hint {
-      font-size: 14px;
+    .subtitle {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+      line-height: 1.4;
+    }
+
+    .btn-google {
+      width: 100%;
+      height: 54px;
+      border-radius: 27px;
+      border: 1.5px solid var(--outline);
+      background: var(--surface);
+      color: var(--text-main);
+      font-size: 16px;
       font-weight: 700;
-      color: var(--muted);
-      text-align: center;
-    }
-
-    .state-pill {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 8px 16px;
-      border-radius: 999px;
+      gap: 12px;
+      cursor: pointer;
+      transition: transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .btn-google:hover {
+      background: var(--surface-variant);
+      border-color: var(--primary);
+    }
+
+    .btn-google:active {
+      transform: scale(0.98);
+    }
+
+    .btn-google:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      width: 100%;
+      height: 52px;
+      margin-top: 14px;
+      border-radius: 26px;
+      border: none;
       background: var(--primary);
       color: var(--on-primary);
-      font-size: 13.5px;
-      font-weight: 900;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    .status {
+      margin-top: 18px;
+      font-size: 14px;
+      font-weight: 600;
+      min-height: 20px;
+      color: var(--text-muted);
+      word-break: break-word;
+    }
+
+    .status.error {
+      color: var(--error);
+    }
+
+    .status.ok {
+      color: var(--primary);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
     }
   </style>
 </head>
 <body>
-  <main class="card" id="card">
-    <div class="badge">
-      <span class="dot" aria-hidden="true"></span>
-      <span>BlissAnimate</span>
-    </div>
+  <div class="m3-bg" aria-hidden="true">
+    <svg class="m3-wave-top" viewBox="0 0 240 240">
+      <path id="bgWave1" fill="#1e7b74"></path>
+    </svg>
+    <svg class="m3-wave-bottom" viewBox="0 0 240 240">
+      <path id="bgWave2" fill="#165752"></path>
+    </svg>
+  </div>
 
-    <button class="photo-btn" id="photoToggle" type="button" aria-label="Переключить фото">
-      <img id="mainPhoto" src="Screenshot_20261118_101200_Vexel.jpg" alt="Vexel" draggable="false" />
+  <main class="card">
+    <button id="iconToggle" class="icon-btn" type="button" aria-label="Иконка BlissChat">
+      <svg id="blissIconSvg" viewBox="0 0 120 120">
+        <defs>
+          <linearGradient id="blissGrad" x1="60" y1="22" x2="60" y2="108" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#0d6c6c" />
+            <stop offset="48%" stop-color="#5c2824" />
+            <stop offset="100%" stop-color="#b5110d" />
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" fill="#a8e2d4" />
+        <path d="M-8,-8 L64,-8 C54,14 34,26 12,26 C2,26 -4,22 -8,18 Z" fill="#cbece4" />
+        <path d="M128,48 L128,128 L56,128 C64,104 82,86 102,74 C112,68 120,58 128,48 Z" fill="#5b6f6f" />
+        <line x1="62" y1="34" x2="77" y2="17" stroke="#0d6c6c" stroke-width="9.5" stroke-linecap="round" />
+        <path id="blissFlowerPath" fill="url(#blissGrad)" fill-rule="evenodd" />
+      </svg>
+      <img id="numbersImg" src="1795540246710.jpg" alt="" draggable="false" hidden />
     </button>
 
-    <div class="state-pill" id="stateLabel">Vexel</div>
-    <p class="hint" id="hintText">Нажми на фото, чтобы открыть с цифрами</p>
+    <h1>Добро пожаловать</h1>
+    <p class="subtitle">Войдите через Google, чтобы вернуться в BlissChat</p>
+
+    <button id="googleBtn" class="btn-google" type="button">
+      <svg width="20" height="20" viewBox="0 0 24 24">
+        <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z"/>
+        <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.5H12v4.8h6.5c-.3 1.5-1.1 2.8-2.4 3.6l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+        <path fill="#FBBC05" d="M5.3 14.8c-.2-.8-.4-1.6-.4-2.5s.2-1.7.4-2.5L1.6 7C.6 9 0 11.2 0 13.5s.6 4.5 1.6 6.5l3.7-2.9z"/>
+        <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.8C3.5 21.1 7.4 24 12 24z"/>
+      </svg>
+      <span>Продолжить с Google</span>
+    </button>
+
+    <a id="openAppBtn" class="btn-primary" href="#">Открыть BlissChat</a>
+    <div id="status" class="status"></div>
   </main>
 
   <script>
-    const MAIN_SRC = "Screenshot_20261118_101200_Vexel.jpg";
-    const NUMBERS_SRC = "1795540246710.jpg";
+    function buildSmoothWave(cx, cy, baseR, amp, waves, samples = 240) {
+      let d = "";
+      for (let i = 0; i <= samples; i++) {
+        const t = (i / samples) * Math.PI * 2;
+        const r = baseR + amp * Math.cos(t * waves);
+        const x = cx + Math.cos(t) * r;
+        const y = cy + Math.sin(t) * r;
+        d += (i === 0 ? "M " : "L ") + `${x.toFixed(2)} ${y.toFixed(2)} `;
+      }
+      return d + "Z";
+    }
 
-    const card = document.getElementById("card");
-    const photoToggle = document.getElementById("photoToggle");
-    const mainPhoto = document.getElementById("mainPhoto");
-    const stateLabel = document.getElementById("stateLabel");
-    const hintText = document.getElementById("hintText");
+    document.getElementById("blissFlowerPath").setAttribute(
+      "d",
+      buildSmoothWave(60, 65, 42.5, 3.2, 16, 280) + " " + buildSmoothWave(60, 65, 23.5, 2.1, 16, 240)
+    );
+    document.getElementById("bgWave1").setAttribute("d", buildSmoothWave(120, 120, 92, 9, 12, 240));
+    document.getElementById("bgWave2").setAttribute("d", buildSmoothWave(120, 120, 96, 10, 10, 240));
 
-    // Предзагрузка второго фото, чтобы переключалось мгновенно
-    const preload = new Image();
-    preload.src = NUMBERS_SRC;
+    const iconToggle = document.getElementById("iconToggle");
+    const blissIconSvg = document.getElementById("blissIconSvg");
+    const numbersImg = document.getElementById("numbersImg");
+    let showNumbers = false;
 
-    requestAnimationFrame(() => card.classList.add("ready"));
+    iconToggle.addEventListener("click", () => {
+      showNumbers = !showNumbers;
+      blissIconSvg.hidden = showNumbers;
+      numbersImg.hidden = !showNumbers;
+    });
+  </script>
 
-    let showingNumbers = false;
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-    photoToggle.addEventListener("click", () => {
-      showingNumbers = !showingNumbers;
-      photoToggle.classList.add("switching");
+    const firebaseConfig = {
+      apiKey: "AIzaSyBUXc71LMSwk0Nb82bieZFZbGeMtJ5uU2s",
+      authDomain: "bitrate-71684.firebaseapp.com",
+      projectId: "bitrate-71684",
+      storageBucket: "bitrate-71684.firebasestorage.app",
+      messagingSenderId: "794345122154",
+      appId: "1:794345122154:web:05b6f2241d89652b895d13"
+    };
 
-      setTimeout(() => {
-        if (showingNumbers) {
-          mainPhoto.src = NUMBERS_SRC;
-          mainPhoto.alt = "Фото с цифрами";
-          stateLabel.textContent = "Фото с цифрами";
-          hintText.textContent = "Нажми ещё раз, чтобы вернуть Vexel";
-        } else {
-          mainPhoto.src = MAIN_SRC;
-          mainPhoto.alt = "Vexel";
-          stateLabel.textContent = "Vexel";
-          hintText.textContent = "Нажми на фото, чтобы открыть с цифрами";
-        }
-        photoToggle.classList.remove("switching");
-      }, 120);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
+
+    const btn = document.getElementById("googleBtn");
+    const openAppBtn = document.getElementById("openAppBtn");
+    const statusEl = document.getElementById("status");
+
+    function setStatus(text, type = "") {
+      statusEl.textContent = text;
+      statusEl.className = "status " + type;
+    }
+
+    btn.addEventListener("click", async () => {
+      btn.disabled = true;
+      setStatus("Открываем окно выбора аккаунта...");
+
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const idToken = credential?.idToken || await result.user.getIdToken();
+
+        const deepLink = `blisschat://auth?idToken=${encodeURIComponent(idToken)}`;
+        openAppBtn.href = deepLink;
+        openAppBtn.style.display = "flex";
+
+        setStatus(`Вы вошли как ${result.user.email}. Возвращаем в приложение...`, "ok");
+        window.location.href = deepLink;
+      } catch (err) {
+        console.error(err);
+        setStatus(`Ошибка входа: ${err.code || err.message}`, "error");
+      } finally {
+        btn.disabled = false;
+      }
     });
   </script>
 </body>
